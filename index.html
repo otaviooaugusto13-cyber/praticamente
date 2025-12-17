@@ -6,98 +6,116 @@
   <title>Praticamente Cursos — Versão Full</title>
   <style>
     /* 1. ESTILOS GERAIS */
+    :root { --primary: #007bff; --bg: #141414; --card-bg: #1f1f1f; --text: #fff; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-    body { background: #141414; color: #fff; padding-bottom: 40px; overflow-x: hidden; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 40px; overflow-x: hidden; }
     
     /* 2. HEADER & PESQUISA */
     header {
       position: fixed; top: 0; left: 0; right: 0; height: 64px;
-      background-color: #141414; transition: all 0.4s ease; 
+      background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0));
+      transition: background-color 0.4s ease; 
       display: flex; align-items: center; padding: 0 4%; z-index: 100;
       justify-content: space-between;
     }
-    header.scrolled { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); height: 55px; }
-    .logo-group h1 { font-size: 24px; font-weight: bold; cursor: pointer; }
-    .text-blue { color: #007bff; }
+    header.scrolled { background-color: #141414; border-bottom: 1px solid #333; }
+    .logo-group h1 { font-size: 24px; font-weight: bold; cursor: pointer; letter-spacing: -1px; }
+    .text-blue { color: var(--primary); }
     .nav-icons { display: flex; align-items: center; gap: 20px; }
     .icon-btn-search { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
-    .search-icon { width: 16px; height: 16px; border: 1.5px solid #fff; border-radius: 50%; position: relative; transform: rotate(-45deg); }
-    .search-icon::after { content: ''; position: absolute; bottom: -6px; right: 4px; width: 1.5px; height: 7px; background: #fff; }
-    .avatar { height: 32px; width: 32px; background: #333; border-radius: 4px; cursor: pointer; overflow: hidden; }
+    .search-icon { width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; position: relative; transform: rotate(-45deg); transition: 0.2s; }
+    .search-icon::after { content: ''; position: absolute; bottom: -6px; right: 6px; width: 2px; height: 7px; background: #fff; }
+    .icon-btn-search:hover .search-icon { border-color: var(--primary); }
+    .icon-btn-search:hover .search-icon::after { background: var(--primary); }
+    
+    .avatar { height: 32px; width: 32px; background: #333; border-radius: 4px; cursor: pointer; overflow: hidden; border: 1px solid transparent; transition: 0.2s; }
+    .avatar:hover { border-color: var(--primary); }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .search-bar-container { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #141414; z-index: 101; display: none; align-items: center; padding: 0 4%; }
-    .search-bar-container.active { display: flex; }
-    .search-input { width: 100%; height: 40px; border: none; background: #282828; color: #fff; padding: 0 15px; border-radius: 4px; }
-    .search-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; margin-left: 10px; }
+    .search-bar-container { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #141414; z-index: 101; display: none; align-items: center; padding: 0 4%; border-bottom: 1px solid #333; }
+    .search-bar-container.active { display: flex; animation: slideDown 0.3s ease; }
+    @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+    .search-input { width: 100%; height: 40px; border: none; background: #282828; color: #fff; padding: 0 15px; border-radius: 4px; font-size: 16px; outline: none; }
+    .search-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; margin-left: 15px; }
 
     /* 3. HERO */
-    .hero { height: 60vh; background: linear-gradient(to top, #141414, transparent), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600') center/cover; display: flex; align-items: center; padding: 0 4%; }
-    .hero h2 { font-size: 3rem; max-width: 700px; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
-
+    .hero { height: 65vh; background: linear-gradient(to top, #141414 10%, transparent 90%), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600') center/cover; display: flex; align-items: center; padding: 0 4%; position: relative; }
+    .hero h2 { font-size: 3.5rem; max-width: 800px; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 2px 20px rgba(0,0,0,0.9); font-weight: 800; }
+    
     /* 4. CARROSSEL & ITENS */
-    .category-section { padding: 20px 4%; }
-    .category-title { font-size: 1.4rem; margin-bottom: 10px; color: #e5e5e5; font-weight: 600; }
-    .carousel-container { position: relative; }
-    .carousel { display: flex; gap: 10px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding: 15px 0; }
+    .category-section { padding: 30px 4%; opacity: 0; animation: fadeIn 1s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+    .category-title { font-size: 1.5rem; margin-bottom: 15px; color: #e5e5e5; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .category-title::before { content:''; display: block; width: 4px; height: 24px; background: var(--primary); border-radius: 2px; }
+    
+    .carousel-container { position: relative; group: 1; }
+    .carousel { display: flex; gap: 15px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding: 15px 0; }
     .carousel::-webkit-scrollbar { display: none; }
     
-    .item { min-width: 240px; cursor: pointer; transition: 0.3s; position: relative; flex-shrink: 0; }
+    .item { min-width: 260px; cursor: pointer; transition: transform 0.3s, opacity 0.3s; position: relative; flex-shrink: 0; }
     .item:hover { transform: scale(1.05); z-index: 5; }
     .item.hidden-by-search { display: none; }
-    .thumb { height: 135px; border-radius: 4px; background-size: cover; background-position: center; border: 1px solid #333; }
-    .title-item { font-size: 13px; margin-top: 8px; font-weight: bold; color: #fff; text-transform: uppercase; }
+    .thumb { height: 146px; border-radius: 6px; background-size: cover; background-position: center; border: 1px solid #333; position: relative; overflow: hidden; }
+    .thumb::after { content: '▶ Assistir'; position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; font-weight: bold; opacity: 0; transition: 0.3s; backdrop-filter: blur(2px); }
+    .item:hover .thumb::after { opacity: 1; }
+    
+    .title-item { font-size: 14px; margin-top: 10px; font-weight: bold; color: #fff; }
+    .desc-item { font-size: 12px; color: #aaa; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-    /* Estilo para Livros */
-    .book-item { min-width: 160px; }
-    .book-thumb { height: 240px; border-radius: 4px; background-size: cover; background-position: center; }
+    /* Estilo Livros */
+    .book-item { min-width: 180px; }
+    .book-thumb { height: 260px; border-radius: 6px; background-size: cover; background-position: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.3s; }
+    .book-item:hover .book-thumb { box-shadow: 0 8px 25px rgba(0,123,255,0.3); }
 
-    .btn-side { position: absolute; top: 0; bottom: 0; width: 40px; background: rgba(0,0,0,0.6); color: #fff; border: none; cursor: pointer; z-index: 10; opacity: 0; transition: 0.3s; font-size: 20px; }
+    .btn-side { position: absolute; top: 0; bottom: 0; width: 50px; background: linear-gradient(90deg, rgba(0,0,0,0.8), transparent); color: #fff; border: none; cursor: pointer; z-index: 10; opacity: 0; transition: 0.3s; font-size: 24px; display: flex; align-items: center; justify-content: center; }
     .carousel-container:hover .btn-side { opacity: 1; }
-    .btn-side.left { left: 0; }
-    .btn-side.right { right: 0; }
+    .btn-side.left { left: 0; background: linear-gradient(90deg, rgba(0,0,0,0.9), transparent); }
+    .btn-side.right { right: 0; background: linear-gradient(-90deg, rgba(0,0,0,0.9), transparent); }
 
-    /* 5. MODAL DE CURSO (ESTILO PÁGINA) */
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; padding: 20px; }
+    /* 5. MODAL */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; padding: 20px; backdrop-filter: blur(5px); }
     .modal.show { opacity: 1; }
-    .modal-content { background: #181818; width: 100%; max-width: 850px; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #333; }
-    .close { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #fff; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+    .modal-content { background: #181818; width: 100%; max-width: 900px; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #333; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+    .close { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #fff; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.6); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; }
+    .close:hover { background: #cc0000; }
     
     .iframe-container { width: 100%; padding-bottom: 56.25%; position: relative; background: #000; }
     .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
     .modal-body { padding: 30px; }
 
     /* PROGRESSO */
-    .progress-wrapper { margin-bottom: 20px; }
-    .progress-info { display: flex; justify-content: space-between; font-size: 1rem; margin-bottom: 10px; font-weight: bold; }
-    .progress-container { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
-    .progress-bar { width: 0%; height: 100%; background: #007bff; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    .progress-wrapper { margin-bottom: 25px; }
+    .progress-info { display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 10px; font-weight: bold; }
+    .progress-container { width: 100%; height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
+    .progress-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px var(--primary); }
 
-    /* BOTÕES DE AÇÃO (QUADRADOS VERMELHOS) */
-    .course-actions { display: flex; gap: 12px; margin-top: 25px; border-top: 1px solid #333; padding-top: 25px; }
-    .action-btn { text-decoration: none; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: bold; transition: 0.2s; cursor: pointer; border: none; }
-    .action-btn.primary { background: #fff; color: #000; flex: 2; padding: 16px; font-size: 1rem; }
-    .action-btn.secondary { background: #333; color: #fff; flex: 0.5; padding: 16px; font-size: 0.9rem; }
-    .action-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
+    /* BOTÕES AÇÃO */
+    .course-actions { display: flex; gap: 15px; margin-top: 30px; border-top: 1px solid #333; padding-top: 25px; }
+    .action-btn { text-decoration: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; transition: 0.2s; cursor: pointer; border: none; font-size: 1rem; }
+    .action-btn.primary { background: #fff; color: #000; flex: 2; padding: 18px; }
+    .action-btn.primary:hover { background: var(--primary); color: #fff; }
+    .action-btn.secondary { background: #333; color: #fff; flex: 1; padding: 18px; }
+    .action-btn.secondary:hover { background: #444; }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2.2rem; }
       .course-actions { flex-direction: column; }
-      .hero h2 { font-size: 2rem; }
+      .nav-icons { gap: 10px; }
     }
   </style>
 </head>
 <body>
 
   <div class="search-bar-container" id="search-bar-container">
-    <input type="text" class="search-input" id="search-input" placeholder="O que você quer aprender?" onkeyup="filterContent()">
+    <input type="text" class="search-input" id="search-input" placeholder="Pesquisar curso, livro ou habilidade..." onkeyup="filterContent()">
     <button class="search-close" onclick="toggleSearchBar(false)">✖</button>
   </div>
 
   <header id="main-header">
     <div class="logo-group"><h1 onclick="window.location.reload()"><span class="text-blue">PRATICA</span>MENTE</h1></div>
     <div class="nav-icons">
-      <button class="icon-btn-search" onclick="toggleSearchBar(true)"><span class="search-icon"></span></button>
-      <div class="avatar" onclick="openProfileModal()"><img src="https://picsum.photos/32/32?random=99"></div>
+      <button class="icon-btn-search" onclick="toggleSearchBar(true)" aria-label="Pesquisar"><span class="search-icon"></span></button>
+      <div class="avatar" onclick="alert('Login em breve conectado ao Banco de Dados!')"><img src="https://ui-avatars.com/api/?name=User&background=random" alt="User"></div>
     </div>
   </header>
 
@@ -105,75 +123,7 @@
     <h2 id="hero-phrase">A evolução começa na mente e acontece na prática.</h2>
   </section>
 
-  <section class="category-section">
-    <h3 class="category-title">Mais Vistos</h3>
-    <div class="carousel-container">
-      <button class="btn-side left" onclick="scrollBtn('car-vistos', -1)">❮</button>
-      <div class="carousel" id="car-vistos">
-        <div class="item" data-title="Oratória Master" onclick="openVideoModal('Oratória Master', 'Domine o medo de falar em público.', 'https://www.youtube.com/embed/qz0aGYrrlhU', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=1')"></div>
-          <p class="title-item">Oratória Master</p>
-        </div>
-        <div class="item" data-title="Excel Business" onclick="openVideoModal('Excel Business', 'Planilhas inteligentes para o mercado.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=2')"></div>
-          <p class="title-item">Excel Business</p>
-        </div>
-        <div class="item" data-title="Inglês Rápido" onclick="openVideoModal('Inglês Rápido', 'Fale inglês em situações reais.', 'https://www.youtube.com/embed/PkZNo7MFNFg', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=3')"></div>
-          <p class="title-item">Inglês Rápido</p>
-        </div>
-        <div class="item" data-title="Power BI" onclick="openVideoModal('Power BI', 'Crie dashboards profissionais.', 'https://www.youtube.com/embed/qz0aGYrrlhU', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=4')"></div>
-          <p class="title-item">Power BI</p>
-        </div>
-      </div>
-      <button class="btn-side right" onclick="scrollBtn('car-vistos', 1)">❯</button>
-    </div>
-  </section>
-
-  <section class="category-section">
-    <h3 class="category-title">Auto Liderança</h3>
-    <div class="carousel-container">
-      <button class="btn-side left" onclick="scrollBtn('car-lider', -1)">❮</button>
-      <div class="carousel" id="car-lider">
-        <div class="item" data-title="Inteligência Emocional" onclick="openVideoModal('Inteligência Emocional', 'O controle das suas emoções.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=10')"></div>
-          <p class="title-item">Inteligência Emocional</p>
-        </div>
-        <div class="item" data-title="Gestão do Tempo" onclick="openVideoModal('Gestão do Tempo', 'Produza mais em menos tempo.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=11')"></div>
-          <p class="title-item">Gestão do Tempo</p>
-        </div>
-        <div class="item" data-title="Resiliência" onclick="openVideoModal('Resiliência', 'Como superar desafios.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=12')"></div>
-          <p class="title-item">Resiliência</p>
-        </div>
-      </div>
-      <button class="btn-side right" onclick="scrollBtn('car-lider', 1)">❯</button>
-    </div>
-  </section>
-
-  <section class="category-section">
-    <h3 class="category-title">Livros Recomendados</h3>
-    <div class="carousel-container">
-      <button class="btn-side left" onclick="scrollBtn('car-livros', -1)">❮</button>
-      <div class="carousel" id="car-livros">
-        <div class="item book-item" data-title="Mindset" onclick="openVideoModal('Resumo: Mindset', 'A psicologia do sucesso.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=30')"></div>
-          <p class="title-item">Mindset</p>
-        </div>
-        <div class="item book-item" data-title="Essencialismo" onclick="openVideoModal('Resumo: Essencialismo', 'Foque no que importa.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=31')"></div>
-          <p class="title-item">Essencialismo</p>
-        </div>
-        <div class="item book-item" data-title="Hábitos Atômicos" onclick="openVideoModal('Resumo: Hábitos Atômicos', 'Pequenas mudanças, grandes resultados.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=32')"></div>
-          <p class="title-item">Hábitos Atômicos</p>
-        </div>
-      </div>
-      <button class="btn-side right" onclick="scrollBtn('car-livros', 1)">❯</button>
-    </div>
-  </section>
+  <div id="app-content"></div>
 
   <div class="modal" id="video-modal">
     <div class="modal-content course-page">
@@ -186,28 +136,23 @@
       <div class="modal-body">
         <div class="progress-wrapper">
           <div class="progress-info">
-            <h2 id="modalTitle" style="margin:0"></h2>
-            <span id="progress-text">0% concluído</span>
+            <h2 id="modalTitle" style="margin:0">Título do Curso</h2>
+            <span id="progress-text">0%</span>
           </div>
           <div class="progress-container">
             <div id="progress-bar" class="progress-bar"></div>
           </div>
         </div>
 
-        <p id="modalDesc" style="color:#ccc; line-height:1.5"></p>
+        <p id="modalDesc" style="color:#ccc; line-height:1.6; font-size: 15px;"></p>
 
         <div class="course-actions">
-          <button id="btn-aula-1" class="action-btn primary" onclick="markAsComplete()">
-            <span id="check-icon" style="margin-right:8px">⚪</span> Aula 1: Montando uma conta
+          <button id="btn-concluir" class="action-btn primary" onclick="markAsComplete()">
+            <span id="check-icon" style="margin-right:10px">⚪</span> Marcar como Concluído
           </button>
           
-          <a id="btn-download-video" href="#" download class="action-btn secondary" title="Baixar Vídeo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            Vídeo
-          </a>
-
-          <a id="btn-download-pdf" href="#" download class="action-btn secondary" title="Baixar PDF">
-             📄 PDF Prático
+          <a id="btn-download-pdf" href="#" class="action-btn secondary" onclick="alert('Funcionalidade de PDF será conectada ao Backend em breve!')">
+             📄 Material PDF
           </a>
         </div>
       </div>
@@ -215,9 +160,98 @@
   </div>
 
   <script>
+    // =========================================================
+    // 1. DADOS (SIMULANDO O BANCO DE DADOS POSTGRES)
+    // =========================================================
+    /* NOTA: Quando seu backend (index.js) estiver rodando no Render, 
+       você vai substituir esta lista fixa por um 'fetch' na sua API.
+    */
+    const categoriasData = [
+      {
+        titulo: "Mais Vistos",
+        id: "vistos",
+        items: [
+          { id: 1, title: "Oratória Master", desc: "Domine o medo de falar em público e convença qualquer audiência.", img: "https://images.unsplash.com/photo-1475721027767-pqs.jpg?w=500", video: "https://www.youtube.com/embed/qz0aGYrrlhU" },
+          { id: 2, title: "Excel Business", desc: "Planilhas inteligentes para automação de mercado financeiro.", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500", video: "https://www.youtube.com/embed/Ke90Tje7VS0" },
+          { id: 3, title: "Inglês Rápido", desc: "Fale inglês em situações reais de viagem e trabalho.", img: "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=500", video: "https://www.youtube.com/embed/PkZNo7MFNFg" },
+          { id: 4, title: "Power BI Pro", desc: "Crie dashboards profissionais que impressionam.", img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500", video: "https://www.youtube.com/embed/qz0aGYrrlhU" }
+        ]
+      },
+      {
+        titulo: "Auto Liderança",
+        id: "lideranca",
+        items: [
+          { id: 5, title: "Inteligência Emocional", desc: "O controle das suas emoções define seu sucesso.", img: "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=500", video: "https://www.youtube.com/embed/Ke90Tje7VS0" },
+          { id: 6, title: "Gestão do Tempo", desc: "Produza o dobro na metade do tempo sem burnout.", img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500", video: "https://www.youtube.com/embed/Ke90Tje7VS0" },
+          { id: 7, title: "Resiliência", desc: "Como superar desafios e sair mais forte.", img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500", video: "https://www.youtube.com/embed/Ke90Tje7VS0" }
+        ]
+      },
+      {
+        titulo: "Livros Recomendados",
+        id: "livros",
+        type: "book",
+        items: [
+          { id: 8, title: "Mindset", desc: "A nova psicologia do sucesso.", img: "https://m.media-amazon.com/images/I/71uai6h1q4L._SY466_.jpg", video: "https://www.youtube.com/embed/Ke90Tje7VS0" },
+          { id: 9, title: "Essencialismo", desc: "A disciplinada busca por menos.", img: "https://m.media-amazon.com/images/I/71eijZ-k14L._SY466_.jpg", video: "https://www.youtube.com/embed/Ke90Tje7VS0" },
+          { id: 10, title: "Hábitos Atômicos", desc: "Pequenas mudanças, resultados impressionantes.", img: "https://m.media-amazon.com/images/I/91bYsX41DVL._SY466_.jpg", video: "https://www.youtube.com/embed/Ke90Tje7VS0" }
+        ]
+      }
+    ];
+
+    // =========================================================
+    // 2. FUNÇÃO QUE DESENHA O SITE (RENDERIZAÇÃO)
+    // =========================================================
+    function renderApp() {
+      const appContent = document.getElementById('app-content');
+      appContent.innerHTML = ''; // Limpa antes de desenhar
+
+      categoriasData.forEach(cat => {
+        // Cria seção HTML
+        const sectionHTML = `
+          <section class="category-section">
+            <h3 class="category-title">${cat.titulo}</h3>
+            <div class="carousel-container">
+              <button class="btn-side left" onclick="scrollBtn('${cat.id}', -1)">❮</button>
+              <div class="carousel" id="${cat.id}">
+                ${cat.items.map(item => `
+                  <div class="item ${cat.type === 'book' ? 'book-item' : ''}" 
+                       data-title="${item.title}" 
+                       onclick="openVideoModal('${item.title}', '${item.desc}', '${item.video}')">
+                    <div class="${cat.type === 'book' ? 'book-thumb' : 'thumb'}" 
+                         style="background-image:url('${item.img}')"></div>
+                    <p class="title-item">${item.title}</p>
+                    ${cat.type !== 'book' ? `<p class="desc-item">${item.desc}</p>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+              <button class="btn-side right" onclick="scrollBtn('${cat.id}', 1)">❯</button>
+            </div>
+          </section>
+        `;
+        appContent.innerHTML += sectionHTML;
+      });
+      
+      // Adiciona animação de entrada nas seções
+      const sections = document.querySelectorAll('.category-section');
+      sections.forEach((sec, index) => {
+        sec.style.animationDelay = `${index * 0.2}s`;
+      });
+    }
+
+    // =========================================================
+    // 3. LÓGICA DE INTERFACE
+    // =========================================================
+    
     let currentCourseTitle = "";
 
-    // 1. PESQUISA INTELIGENTE
+    // Scroll Horizontal
+    function scrollBtn(id, dir) {
+      const el = document.getElementById(id);
+      const amount = dir * (window.innerWidth < 768 ? 280 : 500);
+      el.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+
+    // Pesquisa
     function normalize(t) { return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
 
     function filterContent() {
@@ -225,46 +259,67 @@
       const items = document.querySelectorAll('.item');
       items.forEach(item => {
         const title = normalize(item.getAttribute('data-title'));
-        item.classList.toggle('hidden-by-search', !title.includes(query));
+        if(title.includes(query)) {
+          item.classList.remove('hidden-by-search');
+          item.style.display = 'block';
+        } else {
+          item.classList.add('hidden-by-search');
+          item.style.display = 'none';
+        }
       });
     }
 
     function toggleSearchBar(show) {
       const bar = document.getElementById('search-bar-container');
-      bar.style.display = show ? 'flex' : 'none';
-      if(show) document.getElementById('search-input').focus();
-      else { document.getElementById('search-input').value = ''; filterContent(); }
+      if(show) {
+        bar.classList.add('active');
+        document.getElementById('search-input').focus();
+      } else {
+        bar.classList.remove('active');
+        document.getElementById('search-input').value = '';
+        filterContent();
+      }
     }
 
-    // 2. SCROLL DOS BOTÕES
-    function scrollBtn(id, dir) {
-      const el = document.getElementById(id);
-      const amount = dir * 400;
-      el.scrollLeft += amount;
-    }
-
-    // 3. LOGICA DO MODAL, PROGRESSO E STORAGE
-    function openVideoModal(title, desc, videoUrl, linkAula1, linkDownload, linkPdf) {
+    // Modal e Player
+    function openVideoModal(title, desc, videoUrl) {
       currentCourseTitle = title;
       const modal = document.getElementById('video-modal');
       
       document.getElementById('modalTitle').innerText = title;
       document.getElementById('modalDesc').innerText = desc;
-      document.getElementById('btn-download-video').href = linkDownload || "#";
-      document.getElementById('btn-download-pdf').href = linkPdf || "#";
-
+      
       updateProgressUI();
 
-      let embed = videoUrl.includes("watch?v=") ? videoUrl.replace("watch?v=", "embed/") : videoUrl;
-      document.getElementById('video').src = embed + (embed.includes('?') ? '&' : '?') + 'autoplay=1';
+      // Ajusta URL do Youtube para embed
+      let embed = videoUrl;
+      if(videoUrl.includes("watch?v=")) embed = videoUrl.replace("watch?v=", "embed/");
+      
+      document.getElementById('video').src = embed + (embed.includes('?') ? '&' : '?') + 'autoplay=1&modestbranding=1&rel=0';
 
       modal.style.display = 'flex';
       setTimeout(() => { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }, 10);
     }
 
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+      
+      // Para o vídeo ao fechar
+      setTimeout(() => { 
+        modal.style.display = 'none'; 
+        document.getElementById('video').src = ''; 
+      }, 300);
+    }
+
+    // Progresso Local (Mockado por enquanto)
     function markAsComplete() {
       localStorage.setItem('prog_' + currentCourseTitle, '100');
       updateProgressUI();
+      
+      // Futuro: Enviar fetch para backend salvar no Postgres
+      // fetch('/api/complete-course', { method: 'POST', body: ... })
     }
 
     function updateProgressUI() {
@@ -272,6 +327,7 @@
       const bar = document.getElementById('progress-bar');
       const text = document.getElementById('progress-text');
       const check = document.getElementById('check-icon');
+      const btn = document.getElementById('btn-concluir');
 
       bar.style.width = prog + '%';
       text.innerText = prog + '% concluído';
@@ -280,24 +336,29 @@
         bar.style.background = '#28a745';
         text.style.color = '#28a745';
         check.innerText = '✅';
+        btn.innerText = "Curso Concluído";
+        btn.style.background = "#28a745";
+        btn.style.color = "#fff";
       } else {
         bar.style.background = '#007bff';
-        text.style.color = '#007bff';
+        text.style.color = '#fff';
         check.innerText = '⚪';
+        btn.innerText = "Marcar como Concluído";
+        btn.style.background = "#fff";
+        btn.style.color = "#000";
       }
     }
 
-    function closeModal(id) {
-      const modal = document.getElementById(id);
-      modal.classList.remove('show');
-      document.body.style.overflow = '';
-      document.getElementById('video').src = '';
-      setTimeout(() => { modal.style.display = 'none'; }, 400);
-    }
-
+    // Header Color change on scroll
     window.addEventListener('scroll', () => {
-      document.getElementById('main-header').classList.toggle('scrolled', window.scrollY > 50);
+      const header = document.getElementById('main-header');
+      if (window.scrollY > 50) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
     });
+
+    // Iniciar
+    renderApp();
+
   </script>
 </body>
 </html>
