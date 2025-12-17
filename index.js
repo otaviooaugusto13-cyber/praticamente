@@ -1,136 +1,81 @@
-import express from "express";
-import cors from "cors";
-import pkg from "pg";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-
-const { Pool } = pkg;
+require('dotenv').config();
+const express = require('express');
+const { Client } = require('pg');
+const cors = require('cors');
+const path = require('path');
 
 const app = express();
+
+// Configurações iniciais
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname))); // Serve os arquivos da pasta (index.html, etc)
 
-// 🔐 CONFIGURAÇÕES
-const JWT_SECRET = "troque_essa_chave_depois";
-
-// 🗄️ CONEXÃO COM POSTGRES (Render)
-const pool = new Pool({
+// Conexão com o Banco de Dados do Render
+const client = new Client({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: { rejectUnauthorized: false }
 });
 
-// 🧪 TESTE DE CONEXÃO
-pool
-  .query("SELECT NOW()")
-  .then(() => console.log("✅ Banco conectado com sucesso"))
-  .catch((err) => console.error("❌ Erro ao conectar no banco:", err));
+client.connect()
+  .then(() => {
+    console.log('✅ Conectado ao PostgreSQL no Render!');
+    initDb(); // Cria as tabelas assim que conecta
+  })
+  .catch(err => console.error('❌ Erro de conexão:', err));
 
-// 📌 CRIAR TABELA (se não existir)
-const createTable = async () => {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-};
-createTable();
-
-// 🔐 GERAR TOKEN
-const gerarToken = (user) => {
-  return jwt.sign(
-    { id: user.id, email: user.email },
-    JWT_SECRET,
-    { expiresIn: "30d" }
-  );
-};
-
-// 📥 REGISTRO / LOGIN AUTOMÁTICO (Hotmart)
-app.post("/auth", async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: "Email obrigatório" });
-  }
-
+// Função para criar a tabela e dados iniciais automaticamente
+async function initDb() {
   try {
-    let user = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
-
-    // 👤 Se não existir, cria usuário
-    if (user.rows.length === 0) {
-      const senhaPadrao = email.split("@")[0];
-      const hash = await bcrypt.hash(senhaPadrao, 10);
-
-      user = await pool.query(
-        "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
-        [email, hash]
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS cursos (
+        id SERIAL PRIMARY KEY,
+        categoria VARCHAR(100),
+        title VARCHAR(255),
+        descricao TEXT,
+        img TEXT,
+        video TEXT,
+        is_book BOOLEAN DEFAULT FALSE
       );
+    `);
+
+    const res = await client.query('SELECT count(*) FROM cursos');
+    if (res.rows[0].count === '0') {
+      console.log('Populando banco de dados inicial...');
+      await client.query(`
+        INSERT INTO cursos (categoria, title, descricao, img, video, is_book) VALUES
+        ('Mais Vistos', 'Oratória Master', 'Domine o medo de falar em público.', 'https://images.unsplash.com/photo-1475721027767-pqs.jpg?w=500', 'https://www.youtube.com/embed/qz0aGYrrlhU', false),
+        ('Mais Vistos', 'Excel Business', 'Planilhas inteligentes.', 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500', 'https://www.youtube.com/embed/Ke90Tje7VS0', false),
+        ('Auto Liderança', 'Inteligência Emocional', 'O controle das emoções.', 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=500', 'https://www.youtube.com/embed/Ke90Tje7VS0', false),
+        ('Livros Recomendados', 'Hábitos Atômicos', 'Pequenas mudanças, grandes resultados.', 'https://m.media-amazon.com/images/I/91bYsX41DVL._SY466_.jpg', 'https://www.youtube.com/embed/Ke90Tje7VS0', true);
+      `);
     }
-
-    const token = gerarToken(user.rows[0]);
-
-    res.json({ token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro no servidor" });
+    console.error('Erro ao inicializar banco:', err);
   }
-});
+}
 
-// 🔑 LOGIN COM EMAIL + SENHA
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
+// ROTA API: O Frontend vai chamar isso aqui
+app.get('/api/cursos', async (req, res) => {
   try {
-    const user = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
+    const result = await client.query('SELECT * FROM cursos ORDER BY id ASC');
+    const cursos = result.rows;
 
-    if (user.rows.length === 0) {
-      return res.status(401).json({ error: "Usuário não encontrado" });
-    }
+    // Organiza os dados para o carrossel do Frontend
+    const estruturaHome = [
+      { titulo: "Mais Vistos", id: "vistos", items: cursos.filter(c => c.categoria === 'Mais Vistos') },
+      { titulo: "Auto Liderança", id: "lideranca", items: cursos.filter(c => c.categoria === 'Auto Liderança') },
+      { titulo: "Livros Recomendados", id: "livros", type: "book", items: cursos.filter(c => c.is_book) }
+    ];
 
-    const valido = await bcrypt.compare(
-      password,
-      user.rows[0].password
-    );
-
-    if (!valido) {
-      return res.status(401).json({ error: "Senha inválida" });
-    }
-
-    const token = gerarToken(user.rows[0]);
-    res.json({ token });
+    res.json(estruturaHome);
   } catch (err) {
-    res.status(500).json({ error: "Erro no servidor" });
+    res.status(500).json({ error: "Erro ao buscar cursos" });
   }
 });
 
-// 🛡️ ROTA PROTEGIDA
-app.get("/me", async (req, res) => {
-  const auth = req.headers.authorization;
-
-  if (!auth) {
-    return res.status(401).json({ error: "Token ausente" });
-  }
-
-  try {
-    const decoded = jwt.verify(auth.split(" ")[1], JWT_SECRET);
-    res.json(decoded);
-  } catch {
-    res.status(401).json({ error: "Token inválido" });
-  }
-});
-
-// 🚀 INICIAR SERVIDOR
+// Inicia o servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`🚀 Backend rodando na porta ${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor bombando na porta ${PORT}`);
+});
