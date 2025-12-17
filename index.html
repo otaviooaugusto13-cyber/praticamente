@@ -3,302 +3,481 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Praticamente Cursos — Versão Full</title>
+  <title>Praticamente Cursos — Design Moderno e Scroll Fade</title>
   <style>
-    /* 1. ESTILOS GERAIS */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     body { background: #141414; color: #fff; padding-bottom: 40px; overflow-x: hidden; }
     
-    /* 2. HEADER & PESQUISA */
+    /* Header Estilizado */
     header {
       position: fixed; top: 0; left: 0; right: 0; height: 64px;
-      background-color: #141414; transition: all 0.4s ease; 
+      background-color: #141414; /* Ponto de Partida: PRETO SÓLIDO */
+      transition: all 0.4s ease; 
       display: flex; align-items: center; padding: 0 4%; z-index: 100;
       justify-content: space-between;
     }
-    header.scrolled { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); height: 55px; }
-    .logo-group h1 { font-size: 24px; font-weight: bold; cursor: pointer; }
+
+    /* Classe ativada no Scroll: FICA TRANSPARENTE (Vidro Fumê) */
+    header.scrolled {
+      background-color: rgba(0, 0, 0, 0.4); 
+      backdrop-filter: blur(8px); /* Efeito de vidro fosco */
+      box-shadow: none;
+      height: 55px; /* Redução sutil ao rolar */
+    }
+
+    .logo-group { display: flex; align-items: center; }
+    .logo-group h1 { font-size: 24px; font-weight: bold; cursor: pointer; letter-spacing: 1px; margin-left: 10px; }
     .text-blue { color: #007bff; }
+    .text-white { color: #ffffff; }
+
+    /* Ícones e Avatar */
     .nav-icons { display: flex; align-items: center; gap: 20px; }
-    .icon-btn-search { background: none; border: none; cursor: pointer; display: flex; align-items: center; }
-    .search-icon { width: 16px; height: 16px; border: 1.5px solid #fff; border-radius: 50%; position: relative; transform: rotate(-45deg); }
-    .search-icon::after { content: ''; position: absolute; bottom: -6px; right: 4px; width: 1.5px; height: 7px; background: #fff; }
-    .avatar { height: 32px; width: 32px; background: #333; border-radius: 4px; cursor: pointer; overflow: hidden; }
+    
+    /* Lupa Minimalista (Apenas traços via CSS) */
+    .icon-btn-search {
+        background: none; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0; /* Remove padding default do botão */
+    }
+    .search-icon {
+        width: 16px; height: 16px;
+        border: 1.5px solid #fff; /* O círculo */
+        border-radius: 50%;
+        position: relative;
+        transform: rotate(-45deg);
+    }
+    .search-icon::after {
+        content: '';
+        position: absolute; bottom: -6px; right: 4px; /* A alça */
+        width: 1.5px; height: 7px;
+        background: #fff;
+    }
+
+    .avatar {
+        height: 32px; width: 32px; background: #333;
+        border-radius: 4px; border: 1px solid #555;
+        cursor: pointer; overflow: hidden;
+    }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .search-bar-container { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: #141414; z-index: 101; display: none; align-items: center; padding: 0 4%; }
-    .search-bar-container.active { display: flex; }
-    .search-input { width: 100%; height: 40px; border: none; background: #282828; color: #fff; padding: 0 15px; border-radius: 4px; }
-    .search-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; margin-left: 10px; }
+    /* Hero */
+    .hero {
+      height: 70vh;
+      background: linear-gradient(to top, #141414 10%, transparent 90%), 
+                  url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+      display: flex; align-items: center; padding: 0 4%;
+    }
+    .hero-content { max-width: 650px; }
+    .hero h2 { font-size: 3.5rem; margin-bottom: 15px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); line-height: 1.1; }
+    .hero p { font-size: 1.2rem; margin-bottom: 25px; color: #ccc; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+    .hero-btn {
+      padding: 12px 30px; background: #fff; color: #000; font-weight: bold; 
+      border: none; border-radius: 4px; font-size: 1.1rem; cursor: pointer; transition: 0.2s;
+    }
+    .hero-btn:hover { background: #c0c0c0; }
 
-    /* 3. HERO */
-    .hero { height: 60vh; background: linear-gradient(to top, #141414, transparent), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600') center/cover; display: flex; align-items: center; padding: 0 4%; }
-    .hero h2 { font-size: 3rem; max-width: 700px; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
-
-    /* 4. CARROSSEL & ITENS */
-    .category-section { padding: 20px 4%; }
+    /* Sections & Carousels */
+    .category-section { padding: 20px 4%; margin-bottom: 10px; position: relative; }
     .category-title { font-size: 1.4rem; margin-bottom: 10px; color: #e5e5e5; font-weight: 600; }
-    .carousel-container { position: relative; }
-    .carousel { display: flex; gap: 10px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding: 15px 0; }
-    .carousel::-webkit-scrollbar { display: none; }
     
-    .item { min-width: 240px; cursor: pointer; transition: 0.3s; position: relative; flex-shrink: 0; }
-    .item:hover { transform: scale(1.05); z-index: 5; }
-    .item.hidden-by-search { display: none; }
-    .thumb { height: 135px; border-radius: 4px; background-size: cover; background-position: center; border: 1px solid #333; }
-    .title-item { font-size: 13px; margin-top: 8px; font-weight: bold; color: #fff; text-transform: uppercase; }
+    .carousel-container { position: relative; }
+    .carousel-container:hover .btn { opacity: 1; }
+    
+    .carousel {
+      display: flex; gap: 10px; overflow-x: auto; padding: 20px 0;
+      scroll-behavior: smooth; 
+      scrollbar-width: none; 
+    }
+    .carousel::-webkit-scrollbar { display: none; }
 
-    /* Estilo para Livros */
+    /* Cards - padrão */
+    .item {
+      min-width: 240px; cursor: pointer;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      position: relative; flex-shrink: 0;
+    }
+    .item:hover { transform: scale(1.05); z-index: 10; }
+    .carousel:hover .item:not(:hover) { opacity: 0.5; }
+    .thumb {
+      height: 135px; border-radius: 4px;
+      background-size: cover; background-position: center;
+    }
+    .info { padding-top: 8px; } 
+    .title { font-size: 13px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+
+    /* Cards - Livros (Vertical) */
     .book-item { min-width: 160px; }
     .book-thumb { height: 240px; border-radius: 4px; background-size: cover; background-position: center; }
 
-    .btn-side { position: absolute; top: 0; bottom: 0; width: 40px; background: rgba(0,0,0,0.6); color: #fff; border: none; cursor: pointer; z-index: 10; opacity: 0; transition: 0.3s; font-size: 20px; }
-    .carousel-container:hover .btn-side { opacity: 1; }
-    .btn-side.left { left: 0; }
-    .btn-side.right { right: 0; }
+    /* Marcador invisível para a lógica de infinito */
+    .start-marker { width: 1px; min-width: 1px; flex-shrink: 0; background: transparent; }
 
-    /* 5. MODAL DE CURSO (ESTILO PÁGINA) */
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; padding: 20px; }
+    /* Botões de Navegação */
+    .btn {
+      position: absolute; top: 0; bottom: 0; width: 40px;
+      background: rgba(0,0,0,0.5); border: none; color: #fff;
+      font-size: 24px; cursor: pointer; z-index: 20;
+      opacity: 0; transition: opacity 0.2s; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .btn:hover { background: rgba(0,0,0,0.7); transform: scale(1.1); }
+    .btn.left { left: 0; }
+    .btn.right { right: 0; }
+
+    /* Modal (Simplificado) */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
     .modal.show { opacity: 1; }
-    .modal-content { background: #181818; width: 100%; max-width: 850px; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #333; }
-    .close { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #fff; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-    
-    .iframe-container { width: 100%; padding-bottom: 56.25%; position: relative; background: #000; }
+    .modal-content { background: #181818; width: 95%; max-width: 800px; border-radius: 8px; overflow: hidden; position: relative; }
+    .iframe-container { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; }
     .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-    .modal-body { padding: 30px; }
+    .modal-body { padding: 20px; }
+    .modal h2 { font-size: 1.8rem; margin-bottom: 8px; }
+    .modal p { color: #ccc; line-height: 1.4; font-size: 1rem; }
+    .close { position: absolute; top: 10px; right: 15px; font-size: 28px; color: #fff; cursor: pointer; z-index: 1001; background: rgba(0,0,0,0.5); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
 
-    /* PROGRESSO */
-    .progress-wrapper { margin-bottom: 20px; }
-    .progress-info { display: flex; justify-content: space-between; font-size: 1rem; margin-bottom: 10px; font-weight: bold; }
-    .progress-container { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
-    .progress-bar { width: 0%; height: 100%; background: #007bff; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-
-    /* BOTÕES DE AÇÃO (QUADRADOS VERMELHOS) */
-    .course-actions { display: flex; gap: 12px; margin-top: 25px; border-top: 1px solid #333; padding-top: 25px; }
-    .action-btn { text-decoration: none; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: bold; transition: 0.2s; cursor: pointer; border: none; }
-    .action-btn.primary { background: #fff; color: #000; flex: 2; padding: 16px; font-size: 1rem; }
-    .action-btn.secondary { background: #333; color: #fff; flex: 0.5; padding: 16px; font-size: 0.9rem; }
-    .action-btn:hover { transform: scale(1.02); filter: brightness(1.1); }
-
-    @media (max-width: 600px) {
-      .course-actions { flex-direction: column; }
+    @media(max-width: 768px) {
+      .hero { height: 40vh; align-items: flex-end; padding-bottom: 20px; }
       .hero h2 { font-size: 2rem; }
+      .item { min-width: 160px; }
+      .thumb { height: 90px; }
+      .book-item { min-width: 110px; }
+      .book-thumb { height: 160px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="search-bar-container" id="search-bar-container">
-    <input type="text" class="search-input" id="search-input" placeholder="O que você quer aprender?" onkeyup="filterContent()">
-    <button class="search-close" onclick="toggleSearchBar(false)">✖</button>
-  </div>
-
   <header id="main-header">
-    <div class="logo-group"><h1 onclick="window.location.reload()"><span class="text-blue">PRATICA</span>MENTE</h1></div>
+    <div class="logo-group">
+      <h1 onclick="window.location.reload()">
+        <span class="text-blue">PRATICA</span><span class="text-white">MENTE</span>
+      </h1>
+    </div>
+
     <div class="nav-icons">
-      <button class="icon-btn-search" onclick="toggleSearchBar(true)"><span class="search-icon"></span></button>
-      <div class="avatar" onclick="openProfileModal()"><img src="https://picsum.photos/32/32?random=99"></div>
+      <button class="icon-btn-search" onclick="alert('Funcionalidade de Pesquisa')">
+        <span class="search-icon"></span>
+      </button>
+      
+      <div class="avatar" onclick="alert('Abrir Perfil')">
+        <img src="https://picsum.photos/32/32?random=100" alt="Avatar">
+      </div>
     </div>
   </header>
 
   <section class="hero">
-    <h2 id="hero-phrase">A evolução começa na mente e acontece na prática.</h2>
+    <div class="hero-content">
+      <h2 id="hero-phrase">Conhecimento que transforma.</h2>
+      <p>Desenvolva as habilidades mais requisitadas do mercado.</p>
+      <button class="hero-btn">Começar Agora</button>
+    </div>
   </section>
 
   <section class="category-section">
     <h3 class="category-title">Mais Vistos</h3>
     <div class="carousel-container">
-      <button class="btn-side left" onclick="scrollBtn('car-vistos', -1)">❮</button>
+      <button class="btn left" onclick="scrollCarousel('car-vistos', -1)">❮</button>
       <div class="carousel" id="car-vistos">
-        <div class="item" data-title="Oratória Master" onclick="openVideoModal('Oratória Master', 'Domine o medo de falar em público.', 'https://www.youtube.com/embed/qz0aGYrrlhU', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=1')"></div>
-          <p class="title-item">Oratória Master</p>
-        </div>
-        <div class="item" data-title="Excel Business" onclick="openVideoModal('Excel Business', 'Planilhas inteligentes para o mercado.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=2')"></div>
-          <p class="title-item">Excel Business</p>
-        </div>
-        <div class="item" data-title="Inglês Rápido" onclick="openVideoModal('Inglês Rápido', 'Fale inglês em situações reais.', 'https://www.youtube.com/embed/PkZNo7MFNFg', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=3')"></div>
-          <p class="title-item">Inglês Rápido</p>
-        </div>
-        <div class="item" data-title="Power BI" onclick="openVideoModal('Power BI', 'Crie dashboards profissionais.', 'https://www.youtube.com/embed/qz0aGYrrlhU', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=4')"></div>
-          <p class="title-item">Power BI</p>
-        </div>
+        <div class="item" onclick="openModal('Oratória Master','Fale bem em público.','https://www.youtube.com/embed/qz0aGYrrlhU')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=1')"></div><div class="info"><p class="title">ORATÓRIA</p></div></div>
+        <div class="item" onclick="openModal('Excel Business','Planilhas avançadas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=2')"></div><div class="info"><p class="title">EXCEL PRO</p></div></div>
+        <div class="item" onclick="openModal('Inglês Rápido','Conversação essencial.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=3')"></div><div class="info"><p class="title">INGLÊS BUSINESS</p></div></div>
+        <div class="item" onclick="openModal('Power BI','Dashboards incríveis.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=4')"></div><div class="info"><p class="title">POWER BI</p></div></div>
+        <div class="item" onclick="openModal('Python','Automação de tarefas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=5')"></div><div class="info"><p class="title">PYTHON</p></div></div>
+        <div class="item" onclick="openModal('Introdução ao HTML e CSS','Crie sua primeira página web.','https://www.youtube.com/embed/PkZNo7MFNFg')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=6')"></div><div class="info"><p class="title">FRONT-END</p></div></div>
+        <div class="item" onclick="openModal('Finanças Pessoais','Organize seu orçamento e invista.','https://www.youtube.com/embed/1Rs2ND1ryYc')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=7')"></div><div class="info"><p class="title">FINANÇAS</p></div></div>
+        <div class="start-marker" data-name="vistos-start"></div>
+        <div class="item" onclick="openModal('Oratória Master','Fale bem em público.','https://www.youtube.com/embed/qz0aGYrrlhU')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=1')"></div><div class="info"><p class="title">ORATÓRIA</p></div></div>
+        <div class="item" onclick="openModal('Excel Business','Planilhas avançadas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=2')"></div><div class="info"><p class="title">EXCEL PRO</p></div></div>
+        <div class="item" onclick="openModal('Inglês Rápido','Conversação essencial.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=3')"></div><div class="info"><p class="title">INGLÊS BUSINESS</p></div></div>
+        <div class="item" onclick="openModal('Power BI','Dashboards incríveis.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=4')"></div><div class="info"><p class="title">POWER BI</p></div></div>
+        <div class="item" onclick="openModal('Python','Automação de tarefas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=5')"></div><div class="info"><p class="title">PYTHON</p></div></div>
+        <div class="item" onclick="openModal('Introdução ao HTML e CSS','Crie sua primeira página web.','https://www.youtube.com/embed/PkZNo7MFNFg')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=6')"></div><div class="info"><p class="title">FRONT-END</p></div></div>
+        <div class="item" onclick="openModal('Finanças Pessoais','Organize seu orçamento e invista.','https://www.youtube.com/embed/1Rs2ND1ryYc')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=7')"></div><div class="info"><p class="title">FINANÇAS</p></div></div>
+        <div class="item" onclick="openModal('Oratória Master','Fale bem em público.','https://www.youtube.com/embed/qz0aGYrrlhU')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=1')"></div><div class="info"><p class="title">ORATÓRIA</p></div></div>
+        <div class="item" onclick="openModal('Excel Business','Planilhas avançadas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=2')"></div><div class="info"><p class="title">EXCEL PRO</p></div></div>
+        <div class="item" onclick="openModal('Inglês Rápido','Conversação essencial.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=3')"></div><div class="info"><p class="title">INGLÊS BUSINESS</p></div></div>
+        <div class="item" onclick="openModal('Power BI','Dashboards incríveis.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=4')"></div><div class="info"><p class="title">POWER BI</p></div></div>
+        <div class="item" onclick="openModal('Python','Automação de tarefas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=5')"></div><div class="info"><p class="title">PYTHON</p></div></div>
+        <div class="item" onclick="openModal('Introdução ao HTML e CSS','Crie sua primeira página web.','https://www.youtube.com/embed/PkZNo7MFNFg')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=6')"></div><div class="info"><p class="title">FRONT-END</p></div></div>
+        <div class="item" onclick="openModal('Finanças Pessoais','Organize seu orçamento e invista.','https://www.youtube.com/embed/1Rs2ND1ryYc')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=7')"></div><div class="info"><p class="title">FINANÇAS</p></div></div>
       </div>
-      <button class="btn-side right" onclick="scrollBtn('car-vistos', 1)">❯</button>
+      <button class="btn right" onclick="scrollCarousel('car-vistos', 1)">❯</button>
     </div>
   </section>
-
   <section class="category-section">
     <h3 class="category-title">Auto Liderança</h3>
     <div class="carousel-container">
-      <button class="btn-side left" onclick="scrollBtn('car-lider', -1)">❮</button>
+      <button class="btn left" onclick="scrollCarousel('car-lider', -1)">❮</button>
       <div class="carousel" id="car-lider">
-        <div class="item" data-title="Inteligência Emocional" onclick="openVideoModal('Inteligência Emocional', 'O controle das suas emoções.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=10')"></div>
-          <p class="title-item">Inteligência Emocional</p>
-        </div>
-        <div class="item" data-title="Gestão do Tempo" onclick="openVideoModal('Gestão do Tempo', 'Produza mais em menos tempo.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=11')"></div>
-          <p class="title-item">Gestão do Tempo</p>
-        </div>
-        <div class="item" data-title="Resiliência" onclick="openVideoModal('Resiliência', 'Como superar desafios.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=12')"></div>
-          <p class="title-item">Resiliência</p>
-        </div>
+        <div class="item" onclick="openModal('Inteligência Emocional','Controle suas emoções.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=10')"></div><div class="info"><p class="title">INTELIGÊNCIA EMOCIONAL</p></div></div>
+        <div class="item" onclick="openModal('Gestão do Tempo','Produtividade máxima.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=11')"></div><div class="info"><p class="title">PRODUTIVIDADE</p></div></div>
+        <div class="item" onclick="openModal('Foco Absoluto','Elimine distrações.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=12')"></div><div class="info"><p class="title">FOCO</p></div></div>
+        <div class="item" onclick="openModal('Resiliência','Supere adversidades.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=13')"></div><div class="info"><p class="title">RESILIÊNCIA</p></div></div>
+        <div class="item" onclick="openModal('Comunicação Assertiva','Fale o que pensa.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=14')"></div><div class="info"><p class="title">ASSERTIVIDADE</p></div></div>
+        <div class="item" onclick="openModal('Liderança Pessoal','Seja seu próprio guia.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=15')"></div><div class="info"><p class="title">LIDERANÇA PESSOAL</p></div></div>
+        <div class="item" onclick="openModal('Negociação e Influência','Técnicas de convencimento.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=16')"></div><div class="info"><p class="title">NEGOCIAÇÃO</p></div></div>
+        <div class="start-marker" data-name="lider-start"></div>
+        <div class="item" onclick="openModal('Inteligência Emocional','Controle suas emoções.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=10')"></div><div class="info"><p class="title">INTELIGÊNCIA EMOCIONAL</p></div></div>
+        <div class="item" onclick="openModal('Gestão do Tempo','Produtividade máxima.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=11')"></div><div class="info"><p class="title">PRODUTIVIDADE</p></div></div>
+        <div class="item" onclick="openModal('Foco Absoluto','Elimine distrações.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=12')"></div><div class="info"><p class="title">FOCO</p></div></div>
+        <div class="item" onclick="openModal('Resiliência','Supere adversidades.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=13')"></div><div class="info"><p class="title">RESILIÊNCIA</p></div></div>
+        <div class="item" onclick="openModal('Comunicação Assertiva','Fale o que pensa.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=14')"></div><div class="info"><p class="title">ASSERTIVIDADE</p></div></div>
+        <div class="item" onclick="openModal('Liderança Pessoal','Seja seu próprio guia.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=15')"></div><div class="info"><p class="title">LIDERANÇA PESSOAL</p></div></div>
+        <div class="item" onclick="openModal('Negociação e Influência','Técnicas de convencimento.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=16')"></div><div class="info"><p class="title">NEGOCIAÇÃO</p></div></div>
+        <div class="item" onclick="openModal('Inteligência Emocional','Controle suas emoções.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=10')"></div><div class="info"><p class="title">INTELIGÊNCIA EMOCIONAL</p></div></div>
+        <div class="item" onclick="openModal('Gestão do Tempo','Produtividade máxima.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=11')"></div><div class="info"><p class="title">PRODUTIVIDADE</p></div></div>
+        <div class="item" onclick="openModal('Foco Absoluto','Elimine distrações.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=12')"></div><div class="info"><p class="title">FOCO</p></div></div>
+        <div class="item" onclick="openModal('Resiliência','Supere adversidades.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=13')"></div><div class="info"><p class="title">RESILIÊNCIA</p></div></div>
+        <div class="item" onclick="openModal('Comunicação Assertiva','Fale o que pensa.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=14')"></div><div class="info"><p class="title">ASSERTIVIDADE</p></div></div>
+        <div class="item" onclick="openModal('Liderança Pessoal','Seja seu próprio guia.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=15')"></div><div class="info"><p class="title">LIDERANÇA PESSOAL</p></div></div>
+        <div class="item" onclick="openModal('Negociação e Influência','Técnicas de convencimento.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=16')"></div><div class="info"><p class="title">NEGOCIAÇÃO</p></div></div>
       </div>
-      <button class="btn-side right" onclick="scrollBtn('car-lider', 1)">❯</button>
+      <button class="btn right" onclick="scrollCarousel('car-lider', 1)">❯</button>
     </div>
   </section>
-
+  <section class="category-section">
+    <h3 class="category-title">Recursos Humanos</h3>
+    <div class="carousel-container">
+      <button class="btn left" onclick="scrollCarousel('car-rh', -1)">❮</button>
+      <div class="carousel" id="car-rh">
+        <div class="item" onclick="openModal('Recrutamento','Como selecionar talentos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=20')"></div><div class="info"><p class="title">R&S</p></div></div>
+        <div class="item" onclick="openModal('Cultura Organizacional','Construindo valores.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=21')"></div><div class="info"><p class="title">CULTURA</p></div></div>
+        <div class="item" onclick="openModal('Gestão de Pessoas','Liderando equipes.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=22')"></div><div class="info"><p class="title">GESTÃO</p></div></div>
+        <div class="item" onclick="openModal('Feedback Eficaz','Como dar feedback.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=23')"></div><div class="info"><p class="title">FEEDBACK</p></div></div>
+        <div class="item" onclick="openModal('Departamento Pessoal','Rotinas trabalhistas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=24')"></div><div class="info"><p class="title">DP</p></div></div>
+        <div class="item" onclick="openModal('Treinamento e Desenvolvimento','Crescimento de colaboradores.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=25')"></div><div class="info"><p class="title">T&D</p></div></div>
+        <div class="item" onclick="openModal('RH Estratégico','Transformando RH em parceiro de negócio.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=26')"></div><div class="info"><p class="title">HRBP</p></div></div>
+        <div class="start-marker" data-name="rh-start"></div>
+        <div class="item" onclick="openModal('Recrutamento','Como selecionar talentos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=20')"></div><div class="info"><p class="title">R&S</p></div></div>
+        <div class="item" onclick="openModal('Cultura Organizacional','Construindo valores.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=21')"></div><div class="info"><p class="title">CULTURA</p></div></div>
+        <div class="item" onclick="openModal('Gestão de Pessoas','Liderando equipes.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=22')"></div><div class="info"><p class="title">GESTÃO</p></div></div>
+        <div class="item" onclick="openModal('Feedback Eficaz','Como dar feedback.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=23')"></div><div class="info"><p class="title">FEEDBACK</p></div></div>
+        <div class="item" onclick="openModal('Departamento Pessoal','Rotinas trabalhistas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=24')"></div><div class="info"><p class="title">DP</p></div></div>
+        <div class="item" onclick="openModal('Treinamento e Desenvolvimento','Crescimento de colaboradores.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=25')"></div><div class="info"><p class="title">T&D</p></div></div>
+        <div class="item" onclick="openModal('RH Estratégico','Transformando RH em parceiro de negócio.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=26')"></div><div class="info"><p class="title">HRBP</p></div></div>
+        <div class="item" onclick="openModal('Recrutamento','Como selecionar talentos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=20')"></div><div class="info"><p class="title">R&S</p></div></div>
+        <div class="item" onclick="openModal('Cultura Organizacional','Construindo valores.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=21')"></div><div class="info"><p class="title">CULTURA</p></div></div>
+        <div class="item" onclick="openModal('Gestão de Pessoas','Liderando equipes.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=22')"></div><div class="info"><p class="title">GESTÃO</p></div></div>
+        <div class="item" onclick="openModal('Feedback Eficaz','Como dar feedback.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=23')"></div><div class="info"><p class="title">FEEDBACK</p></div></div>
+        <div class="item" onclick="openModal('Departamento Pessoal','Rotinas trabalhistas.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=24')"></div><div class="info"><p class="title">DP</p></div></div>
+        <div class="item" onclick="openModal('Treinamento e Desenvolvimento','Crescimento de colaboradores.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=25')"></div><div class="info"><p class="title">T&D</p></div></div>
+        <div class="item" onclick="openModal('RH Estratégico','Transformando RH em parceiro de negócio.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=26')"></div><div class="info"><p class="title">HRBP</p></div></div>
+      </div>
+      <button class="btn right" onclick="scrollCarousel('car-rh', 1)">❯</button>
+    </div>
+  </section>
   <section class="category-section">
     <h3 class="category-title">Livros Recomendados</h3>
     <div class="carousel-container">
-      <button class="btn-side left" onclick="scrollBtn('car-livros', -1)">❮</button>
+      <button class="btn left" onclick="scrollCarousel('car-livros', -1)">❮</button>
       <div class="carousel" id="car-livros">
-        <div class="item book-item" data-title="Mindset" onclick="openVideoModal('Resumo: Mindset', 'A psicologia do sucesso.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=30')"></div>
-          <p class="title-item">Mindset</p>
-        </div>
-        <div class="item book-item" data-title="Essencialismo" onclick="openVideoModal('Resumo: Essencialismo', 'Foque no que importa.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=31')"></div>
-          <p class="title-item">Essencialismo</p>
-        </div>
-        <div class="item book-item" data-title="Hábitos Atômicos" onclick="openVideoModal('Resumo: Hábitos Atômicos', 'Pequenas mudanças, grandes resultados.', 'https://www.youtube.com/embed/Ke90Tje7VS0', '#', '#', '#')">
-          <div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=32')"></div>
-          <p class="title-item">Hábitos Atômicos</p>
-        </div>
+        <div class="item book-item" onclick="openModal('Mindset','A nova psicologia do sucesso.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=30')"></div><div class="info"><p class="title">MINDSET</p></div></div>
+        <div class="item book-item" onclick="openModal('Essencialismo','Menos, mas melhor.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=31')"></div><div class="info"><p class="title">ESSENCIALISMO</p></div></div>
+        <div class="item book-item" onclick="openModal('O Poder do Hábito','Como mudamos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=32')"></div><div class="info"><p class="title">HÁBITO</p></div></div>
+        <div class="item book-item" onclick="openModal('Comece pelo Porquê','Liderança inspiradora.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=33')"></div><div class="info"><p class="title">PORQUÊ</p></div></div>
+        <div class="item book-item" onclick="openModal('Rápido e Devagar','Duas formas de pensar.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=34')"></div><div class="info"><p class="title">PENSAR</p></div></div>
+        <div class="item book-item" onclick="openModal('Antifrágil','Coisas que se beneficiam com o caos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=35')"></div><div class="info"><p class="title">ANTIFRÁGIL</p></div></div>
+        <div class="item book-item" onclick="openModal('Sapiens','Breve história da humanidade.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=36')"></div><div class="info"><p class="title">SAPIENS</p></div></div>
+        <div class="start-marker" data-name="livros-start"></div>
+        <div class="item book-item" onclick="openModal('Mindset','A nova psicologia do sucesso.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=30')"></div><div class="info"><p class="title">MINDSET</p></div></div>
+        <div class="item book-item" onclick="openModal('Essencialismo','Menos, mas melhor.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=31')"></div><div class="info"><p class="title">ESSENCIALISMO</p></div></div>
+        <div class="item book-item" onclick="openModal('O Poder do Hábito','Como mudamos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=32')"></div><div class="info"><p class="title">HÁBITO</p></div></div>
+        <div class="item book-item" onclick="openModal('Comece pelo Porquê','Liderança inspiradora.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=33')"></div><div class="info"><p class="title">PORQUÊ</p></div></div>
+        <div class="item book-item" onclick="openModal('Rápido e Devagar','Duas formas de pensar.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=34')"></div><div class="info"><p class="title">PENSAR</p></div></div>
+        <div class="item book-item" onclick="openModal('Antifrágil','Coisas que se beneficiam com o caos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=35')"></div><div class="info"><p class="title">ANTIFRÁGIL</p></div></div>
+        <div class="item book-item" onclick="openModal('Sapiens','Breve história da humanidade.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=36')"></div><div class="info"><p class="title">SAPIENS</p></div></div>
+        <div class="item book-item" onclick="openModal('Mindset','A nova psicologia do sucesso.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=30')"></div><div class="info"><p class="title">MINDSET</p></div></div>
+        <div class="item book-item" onclick="openModal('Essencialismo','Menos, mas melhor.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=31')"></div><div class="info"><p class="title">ESSENCIALISMO</p></div></div>
+        <div class="item book-item" onclick="openModal('O Poder do Hábito','Como mudamos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=32')"></div><div class="info"><p class="title">HÁBITO</p></div></div>
+        <div class="item book-item" onclick="openModal('Comece pelo Porquê','Liderança inspiradora.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=33')"></div><div class="info"><p class="title">PORQUÊ</p></div></div>
+        <div class="item book-item" onclick="openModal('Rápido e Devagar','Duas formas de pensar.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=34')"></div><div class="info"><p class="title">PENSAR</p></div></div>
+        <div class="item book-item" onclick="openModal('Antifrágil','Coisas que se beneficiam com o caos.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=35')"></div><div class="info"><p class="title">ANTIFRÁGIL</p></div></div>
+        <div class="item book-item" onclick="openModal('Sapiens','Breve história da humanidade.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="book-thumb" style="background-image:url('https://picsum.photos/300/450?random=36')"></div><div class="info"><p class="title">SAPIENS</p></div></div>
       </div>
-      <button class="btn-side right" onclick="scrollBtn('car-livros', 1)">❯</button>
+      <button class="btn right" onclick="scrollCarousel('car-livros', 1)">❯</button>
     </div>
   </section>
-
-  <div class="modal" id="video-modal">
-    <div class="modal-content course-page">
-      <span class="close" onclick="closeModal('video-modal')">✖</span>
-      
+  <section class="category-section">
+    <h3 class="category-title">Cursos Complementares</h3>
+    <div class="carousel-container">
+      <button class="btn left" onclick="scrollCarousel('car-comp', -1)">❮</button>
+      <div class="carousel" id="car-comp">
+        <div class="item" onclick="openModal('Design Gráfico','Fundamentos visuais.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=40')"></div><div class="info"><p class="title">DESIGN</p></div></div>
+        <div class="item" onclick="openModal('Copywriting','Escrita persuasiva.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=41')"></div><div class="info"><p class="title">COPY</p></div></div>
+        <div class="item" onclick="openModal('Edição de Vídeo','Cortes e transições.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=42')"></div><div class="info"><p class="title">EDIÇÃO</p></div></div>
+        <div class="item" onclick="openModal('Fotografia','Composição e luz.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=43')"></div><div class="info"><p class="title">FOTO</p></div></div>
+        <div class="item" onclick="openModal('Introdução ao Mercado Financeiro','Como começar a investir.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=44')"></div><div class="info"><p class="title">INVESTIMENTOS</p></div></div>
+        <div class="item" onclick="openModal('Ilustração Digital','Técnicas com mesa digitalizadora.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=45')"></div><div class="info"><p class="title">ILUSTRAÇÃO</p></div></div>
+        <div class="item" onclick="openModal('Noções de Contabilidade','Entenda o balanço da sua empresa.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=46')"></div><div class="info"><p class="title">CONTABILIDADE</p></div></div>
+        <div class="start-marker" data-name="comp-start"></div>
+        <div class="item" onclick="openModal('Design Gráfico','Fundamentos visuais.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=40')"></div><div class="info"><p class="title">DESIGN</p></div></div>
+        <div class="item" onclick="openModal('Copywriting','Escrita persuasiva.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=41')"></div><div class="info"><p class="title">COPY</p></div></div>
+        <div class="item" onclick="openModal('Edição de Vídeo','Cortes e transições.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=42')"></div><div class="info"><p class="title">EDIÇÃO</p></div></div>
+        <div class="item" onclick="openModal('Fotografia','Composição e luz.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=43')"></div><div class="info"><p class="title">FOTO</p></div></div>
+        <div class="item" onclick="openModal('Introdução ao Mercado Financeiro','Como começar a investir.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=44')"></div><div class="info"><p class="title">INVESTIMENTOS</p></div></div>
+        <div class="item" onclick="openModal('Ilustração Digital','Técnicas com mesa digitalizadora.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=45')"></div><div class="info"><p class="title">ILUSTRAÇÃO</p></div></div>
+        <div class="item" onclick="openModal('Noções de Contabilidade','Entenda o balanço da sua empresa.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=46')"></div><div class="info"><p class="title">CONTABILIDADE</p></div></div>
+        <div class="item" onclick="openModal('Design Gráfico','Fundamentos visuais.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=40')"></div><div class="info"><p class="title">DESIGN</p></div></div>
+        <div class="item" onclick="openModal('Copywriting','Escrita persuasiva.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=41')"></div><div class="info"><p class="title">COPY</p></div></div>
+        <div class="item" onclick="openModal('Edição de Vídeo','Cortes e transições.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=42')"></div><div class="info"><p class="title">EDIÇÃO</p></div></div>
+        <div class="item" onclick="openModal('Fotografia','Composição e luz.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=43')"></div><div class="info"><p class="title">FOTO</p></div></div>
+        <div class="item" onclick="openModal('Introdução ao Mercado Financeiro','Como começar a investir.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=44')"></div><div class="info"><p class="title">INVESTIMENTOS</p></div></div>
+        <div class="item" onclick="openModal('Ilustração Digital','Técnicas com mesa digitalizadora.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=45')"></div><div class="info"><p class="title">ILUSTRAÇÃO</p></div></div>
+        <div class="item" onclick="openModal('Noções de Contabilidade','Entenda o balanço da sua empresa.','https://www.youtube.com/embed/Ke90Tje7VS0')"><div class="thumb" style="background-image:url('https://picsum.photos/400/225?random=46')"></div><div class="info"><p class="title">CONTABILIDADE</p></div></div>
+      </div>
+      <button class="btn right" onclick="scrollCarousel('car-comp', 1)">❯</button>
+    </div>
+  </section>
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">✖</span>
       <div class="iframe-container">
         <iframe id="video" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
-
       <div class="modal-body">
-        <div class="progress-wrapper">
-          <div class="progress-info">
-            <h2 id="modalTitle" style="margin:0"></h2>
-            <span id="progress-text">0% concluído</span>
-          </div>
-          <div class="progress-container">
-            <div id="progress-bar" class="progress-bar"></div>
-          </div>
-        </div>
-
-        <p id="modalDesc" style="color:#ccc; line-height:1.5"></p>
-
-        <div class="course-actions">
-          <button id="btn-aula-1" class="action-btn primary" onclick="markAsComplete()">
-            <span id="check-icon" style="margin-right:8px">⚪</span> Aula 1: Montando uma conta
-          </button>
-          
-          <a id="btn-download-video" href="#" download class="action-btn secondary" title="Baixar Vídeo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            Vídeo
-          </a>
-
-          <a id="btn-download-pdf" href="#" download class="action-btn secondary" title="Baixar PDF">
-             📄 PDF Prático
-          </a>
-        </div>
+        <h2 id="modalTitle"></h2>
+        <p id="modalDesc"></p>
       </div>
     </div>
   </div>
 
   <script>
-    let currentCourseTitle = "";
+    // 1. Frases Dinâmicas
+    const phrases = [
+      "Sua evolução não tem limites.",
+      "O próximo nível da sua carreira começa aqui.",
+      "Invista no seu maior ativo: você.",
+      "Habilidades que abrem portas.",
+      "Transforme curiosidade em competência.",
+      "Aprenda hoje, lidere amanhã.",
+      "Conhecimento é a única riqueza que ninguém rouba."
+    ];
 
-    // 1. PESQUISA INTELIGENTE
-    function normalize(t) { return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
-
-    function filterContent() {
-      const query = normalize(document.getElementById('search-input').value);
-      const items = document.querySelectorAll('.item');
-      items.forEach(item => {
-        const title = normalize(item.getAttribute('data-title'));
-        item.classList.toggle('hidden-by-search', !title.includes(query));
-      });
+    function updateHeroPhrase() {
+      const titleElement = document.getElementById('hero-phrase');
+      const randomIndex = Math.floor(Math.random() * phrases.length);
+      titleElement.innerText = phrases[randomIndex];
     }
 
-    function toggleSearchBar(show) {
-      const bar = document.getElementById('search-bar-container');
-      bar.style.display = show ? 'flex' : 'none';
-      if(show) document.getElementById('search-input').focus();
-      else { document.getElementById('search-input').value = ''; filterContent(); }
+    // 2. Lógica do Header Scroll (Preto -> Transparente Fumê)
+    window.addEventListener('scroll', function() {
+      const header = document.getElementById('main-header');
+      // Transiciona para a transparência após 80px de scroll
+      if (window.scrollY > 80) {
+        header.classList.add('scrolled'); 
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // 3. Lógica do Carrossel e Modal
+    let resetPositions = {};
+
+    function calculateResetPositions() {
+      // Largura aproximada dos itens. Idealmente, deve ser dinâmico ou fixo.
+      const ITEM_WIDTH_BASE = 250; 
+      const ITEM_WIDTH_BOOK = 170;
+
+      // Número de itens únicos em cada carrossel
+      const numVistos = 7;
+      const numLider = 7;
+      const numRH = 7;
+      const numLivros = 7; 
+      const numComp = 7;
+
+      // A posição de reset é o scroll necessário para rolar uma vez todos os itens (primeira cópia)
+      resetPositions['car-vistos'] = numVistos * ITEM_WIDTH_BASE; 
+      resetPositions['car-lider'] = numLider * ITEM_WIDTH_BASE; 
+      resetPositions['car-rh'] = numRH * ITEM_WIDTH_BASE; 
+      resetPositions['car-livros'] = numLivros * ITEM_WIDTH_BOOK;
+      resetPositions['car-comp'] = numComp * ITEM_WIDTH_BASE; 
+    }
+    
+    // Recalcula o tamanho ao redimensionar
+    calculateResetPositions();
+    window.addEventListener('resize', calculateResetPositions); 
+
+    function scrollCarousel(id, direction) {
+      const container = document.getElementById(id);
+      // Rola a distância de aproximadamente 3 itens de uma vez
+      const scrollAmount = direction * (id === 'car-livros' ? 170 * 3 : 250 * 3);
+      container.scrollLeft += scrollAmount;
+      setTimeout(() => checkInfiniteScroll(id), 300); 
     }
 
-    // 2. SCROLL DOS BOTÕES
-    function scrollBtn(id, dir) {
-      const el = document.getElementById(id);
-      const amount = dir * 400;
-      el.scrollLeft += amount;
-    }
-
-    // 3. LOGICA DO MODAL, PROGRESSO E STORAGE
-    function openVideoModal(title, desc, videoUrl, linkAula1, linkDownload, linkPdf) {
-      currentCourseTitle = title;
-      const modal = document.getElementById('video-modal');
+    function checkInfiniteScroll(id) {
+      const container = document.getElementById(id);
+      const resetPosition = resetPositions[id];
+      if (!resetPosition) return;
+      const currentScroll = container.scrollLeft;
       
+      // Se rolou muito para frente (chegou na última cópia, volta para a primeira)
+      if (currentScroll >= resetPosition * 2) { 
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = currentScroll - resetPosition;
+      } 
+      // Se rolou muito para trás (chegou no começo, volta para a segunda cópia)
+      else if (currentScroll <= resetPosition * 0.5) {
+        container.style.scrollBehavior = 'auto';
+        container.scrollLeft = currentScroll + resetPosition;
+      }
+      
+      // Restaura o scroll suave para a próxima interação
+      setTimeout(() => {
+        if (container.style.scrollBehavior === 'auto') {
+          container.style.scrollBehavior = 'smooth';
+        }
+      }, 50);
+    }
+
+    document.querySelectorAll('.carousel').forEach(carousel => {
+      carousel.addEventListener('scroll', () => {
+        checkInfiniteScroll(carousel.id);
+      });
+      // Inicializa o scroll no meio (na segunda cópia) para permitir rolar para a esquerda
+      const resetPosition = resetPositions[carousel.id];
+      if (resetPosition) {
+        carousel.scrollLeft = resetPosition;
+      }
+    });
+
+    // Funções do Modal
+    function openModal(title, desc, videoUrl) {
+      const modal = document.getElementById('modal');
+      const video = document.getElementById('video');
       document.getElementById('modalTitle').innerText = title;
       document.getElementById('modalDesc').innerText = desc;
-      document.getElementById('btn-download-video').href = linkDownload || "#";
-      document.getElementById('btn-download-pdf').href = linkPdf || "#";
-
-      updateProgressUI();
-
-      let embed = videoUrl.includes("watch?v=") ? videoUrl.replace("watch?v=", "embed/") : videoUrl;
-      document.getElementById('video').src = embed + (embed.includes('?') ? '&' : '?') + 'autoplay=1';
-
+      const symbol = videoUrl.includes('?') ? '&' : '?';
+      video.src = videoUrl + symbol + 'autoplay=1'; // Adiciona autoplay
       modal.style.display = 'flex';
-      setTimeout(() => { modal.classList.add('show'); document.body.style.overflow = 'hidden'; }, 10);
+      setTimeout(() => modal.classList.add('show'), 10);
+      document.body.style.overflow = 'hidden';
     }
 
-    function markAsComplete() {
-      localStorage.setItem('prog_' + currentCourseTitle, '100');
-      updateProgressUI();
-    }
-
-    function updateProgressUI() {
-      const prog = localStorage.getItem('prog_' + currentCourseTitle) || '0';
-      const bar = document.getElementById('progress-bar');
-      const text = document.getElementById('progress-text');
-      const check = document.getElementById('check-icon');
-
-      bar.style.width = prog + '%';
-      text.innerText = prog + '% concluído';
-      
-      if(prog === '100') {
-        bar.style.background = '#28a745';
-        text.style.color = '#28a745';
-        check.innerText = '✅';
-      } else {
-        bar.style.background = '#007bff';
-        text.style.color = '#007bff';
-        check.innerText = '⚪';
-      }
-    }
-
-    function closeModal(id) {
-      const modal = document.getElementById(id);
+    function closeModal() {
+      const modal = document.getElementById('modal');
       modal.classList.remove('show');
-      document.body.style.overflow = '';
-      document.getElementById('video').src = '';
-      setTimeout(() => { modal.style.display = 'none'; }, 400);
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.getElementById('video').src = '';
+        document.body.style.overflow = '';
+      }, 300);
     }
 
-    window.addEventListener('scroll', () => {
-      document.getElementById('main-header').classList.toggle('scrolled', window.scrollY > 50);
+    // Fecha modal ao clicar fora ou Esc
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
     });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Chamadas iniciais
+    window.onload = function() {
+      updateHeroPhrase();
+    };
   </script>
+
 </body>
 </html>
-
